@@ -1,6 +1,7 @@
 "use strict";
 
 const DbMixin = require("../mixins/db.mixin");
+const Sequelize = require("sequelize");
 
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
@@ -14,15 +15,24 @@ module.exports = {
 	/**
 	 * Mixins
 	 */
-	mixins: [DbMixin("customers")],
+	mixins: [DbMixin("customers", {
+		name: "customer",
+		define: {
+			name: Sequelize.STRING,
+			email: Sequelize.STRING,
+			active: Sequelize.BOOLEAN
+		}
+	})],
 
 	/**
 	 * Settings
 	 */
 	settings: {
+		idField: "id",
+
 		// Available fields in the responses
 		fields: [
-			"_id",
+			"id",
 			"name",
 			"email",
 			"active"

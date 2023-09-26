@@ -43,3 +43,12 @@ Start the project with `npm run dev` command.
 
 * Moleculer website: https://moleculer.services/
 * Moleculer Documentation: https://moleculer.services/docs/0.14/
+
+<!-- 
+https://github.com/ladal1/orm-comparison/tree/main/src/Packages
+
+https://github.com/alfateam/rdb/tree/master#api
+https://mikro-orm.io/docs/relationships
+https://vincit.github.io/objection.js/guide/relations.html
+https://typeorm.io/relations
+ -->

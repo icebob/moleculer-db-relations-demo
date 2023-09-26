@@ -25,11 +25,13 @@
     "moleculer-repl": "^0.7.3"
   },
   "dependencies": {
-    "moleculer-web": "^0.10.4",
+    "moleculer": "^0.14.26",
     "moleculer-db": "^0.8.20",
     "moleculer-db-adapter-mongo": "^0.4.15",
+    "moleculer-db-adapter-sequelize": "^0.2.15",
+    "moleculer-web": "^0.10.4",
     "nats": "^2.7.1",
-    "moleculer": "^0.14.26"
+    "sqlite3": "^5.1.6"
   },
   "engines": {
     "node": ">= 16.x.x"

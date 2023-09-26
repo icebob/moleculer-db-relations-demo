@@ -1,7 +1,9 @@
 "use strict";
 
-const fs = require("fs");
+// const fs = require("fs");
 const DbService	= require("moleculer-db");
+const SqlAdapter = require("moleculer-db-adapter-sequelize");
+// const Sequelize = require("sequelize");
 
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
@@ -9,7 +11,7 @@ const DbService	= require("moleculer-db");
  * @typedef {import('moleculer-db').MoleculerDB} MoleculerDB  Moleculer's DB Service Schema
  */
 
-module.exports = function(collection) {
+module.exports = function(collection, model) {
 	const cacheCleanEventName = `cache.clean.${collection}`;
 
 	/** @type {MoleculerDB & ServiceSchema} */
@@ -67,6 +69,7 @@ module.exports = function(collection) {
 		// NeDB memory adapter for testing
 		schema.adapter = new DbService.MemoryAdapter();
 	} else {
+		/*
 		// NeDB file DB adapter
 
 		// Create data folder
@@ -75,6 +78,12 @@ module.exports = function(collection) {
 		}
 
 		schema.adapter = new DbService.MemoryAdapter({ filename: `./data/${collection}.db` });
+		*/
+
+		// SQLite memory adapter
+		schema.adapter = new SqlAdapter("sqlite://:memory:");
+
+		schema.model = model;
 	}
 
 	return schema;

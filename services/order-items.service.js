@@ -1,6 +1,7 @@
 "use strict";
 
 const DbMixin = require("../mixins/db.mixin");
+const Sequelize = require("sequelize");
 
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
@@ -14,24 +15,54 @@ module.exports = {
 	/**
 	 * Mixins
 	 */
-	mixins: [DbMixin("orderItems")],
+	mixins: [DbMixin("orderItems", {
+		name: "orderItem",
+		define: {
+			orderId: Sequelize.INTEGER,
+			productId: Sequelize.INTEGER,
+			quantity: Sequelize.INTEGER
+		}
+	})],
 
 	/**
 	 * Settings
 	 */
 	settings: {
+		idField: "id",
+
 		// Available fields in the responses
 		fields: [
-			"_id",
+			"id",
 			"orderId",
 			"productId",
 			"quantity"
 		],
 
+		// Populates for relations
+		populates: {
+			// The `productId` field references to a product.
+			product: {
+				field: "productId",
+				action: "products.get",
+				params: {
+					fields: ["name", "price"]
+				}
+			},
+
+			// The `orderId` field references to an order.
+			order: {
+				field: "orderId",
+				action: "orders.get",
+				params: {
+					fields: ["name", "price"]
+				}
+			}
+		},
+
 		// Validator for the `create` & `insert` actions.
 		entityValidator: {
-			orderId: "string",
-			productId: "string",
+			orderId: "number|integer|positive",
+			productId: "number|integer|positive",
 			quantity: "number|integer|positive"
 		}
 	},
