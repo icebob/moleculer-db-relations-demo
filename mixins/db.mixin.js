@@ -18,6 +18,12 @@ module.exports = function(collection, model) {
 	const schema = {
 		mixins: [DbService],
 
+		actions: {
+			clear() {
+				return this.adapter.clear();
+			}
+		},
+
 		events: {
 			/**
 			 * Subscribe to the cache clean event. If it's triggered

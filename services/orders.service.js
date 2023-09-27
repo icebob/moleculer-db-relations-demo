@@ -20,7 +20,6 @@ module.exports = {
 		define: {
 			date: Sequelize.DATE,
 			customerId: Sequelize.INTEGER,
-			totalPrice: Sequelize.INTEGER,
 			status: Sequelize.STRING,
 
 		}
@@ -38,6 +37,7 @@ module.exports = {
 			"date",
 			"customerId",
 			"customer",
+			"items",
 			"totalPrice",
 			"status"
 		],
@@ -51,7 +51,33 @@ module.exports = {
 				params: {
 					fields: ["name", "email"]
 				}
-			}
+			},
+
+			/* Get the items from the `orderItems` service */
+			async items(ids, orders, rule, ctx) {
+				await Promise.all(orders.map(async order => {
+					order.items = await ctx.call("orderItems.find", {
+						query: {
+							orderId: order.id
+						},
+						populate: ["product"]
+					});
+				}));
+			},
+
+			/* It's a virtual field, we calculate the value */
+			async totalPrice(ids, orders, rule, ctx) {
+				await Promise.all(orders.map(async order => {
+					const items = await ctx.call("orderItems.find", {
+						query: {
+							orderId: order.id
+						},
+						populate: ["product"]
+					});
+
+					order.totalPrice = items.reduce((a, b) => a + b.product.price * b.quantity, 0);
+				}));
+			},
 		},
 
 		// Validator for the `create` & `insert` actions.
@@ -80,20 +106,6 @@ module.exports = {
 
 		// --- ADDITIONAL ACTIONS ---
 
-	},
-
-	/**
-	 * Methods
-	 */
-	methods: {
-		/**
-		 * Loading sample data to the collection.
-		 * It is called in the DB.mixin after the database
-		 * connection establishing & the collection is empty.
-		 */
-		async seedDB() {
-			// await this.adapter.insertMany([]);
-		}
 	},
 
 	/**

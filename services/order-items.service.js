@@ -35,6 +35,7 @@ module.exports = {
 			"id",
 			"orderId",
 			"productId",
+			"product",
 			"quantity"
 		],
 
@@ -54,7 +55,7 @@ module.exports = {
 				field: "orderId",
 				action: "orders.get",
 				params: {
-					fields: ["name", "price"]
+					fields: ["id", "date"]
 				}
 			}
 		},
@@ -84,20 +85,6 @@ module.exports = {
 
 		// --- ADDITIONAL ACTIONS ---
 
-	},
-
-	/**
-	 * Methods
-	 */
-	methods: {
-		/**
-		 * Loading sample data to the collection.
-		 * It is called in the DB.mixin after the database
-		 * connection establishing & the collection is empty.
-		 */
-		async seedDB() {
-			// await this.adapter.insertMany([]);
-		}
 	},
 
 	/**

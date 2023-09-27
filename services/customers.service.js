@@ -35,8 +35,22 @@ module.exports = {
 			"id",
 			"name",
 			"email",
+			"orders",
 			"active"
 		],
+
+		// Populates for relations
+		populates: {
+			async orders(ids, customers, rule, ctx) {
+				await Promise.all(customers.map(async cus => {
+					cus.orders = await ctx.call("orders.find", {
+						query: {
+							customerId: cus.id
+						}
+					});
+				}));
+			}
+		},
 
 		// Validator for the `create` & `insert` actions.
 		entityValidator: {
@@ -63,25 +77,6 @@ module.exports = {
 
 		// --- ADDITIONAL ACTIONS ---
 
-	},
-
-	/**
-	 * Methods
-	 */
-	methods: {
-		/**
-		 * Loading sample data to the collection.
-		 * It is called in the DB.mixin after the database
-		 * connection establishing & the collection is empty.
-		 */
-		async seedDB() {
-			await this.adapter.insertMany([
-				{ name: "John Doe", email: "john.doe@moleculer.services", active: true },
-				{ name: "Jane Doe", email: "jane@moleculer.services", active: false },
-				{ name: "Bob Smith", email: "b.smith@moleculer.services", active: true },
-				{ name: "Adam West", email: "west.a@moleculer.services", active: true }
-			]);
-		}
 	},
 
 	/**
