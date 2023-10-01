@@ -78,7 +78,7 @@ erDiagram
 
 ### One-to-many relation
 
-The `orders` service `customerId` field a references to a `customers` entity, so it represents a one-to-many relation. 
+The `orders` service `customerId` field is a reference to a `customers` entity, so it represents a one-to-many relation. 
 
 In order to get the customer entity when listing orders, you should define a `customer` populate in `orders` service settings:
 
@@ -139,7 +139,7 @@ await this.broker.call("orders.find", { populate: ["customer"] })
 ```
 
 #### Opposite 
-To demonstrate the opposite direction, we can define another populate to get the `orderItems` of the `order`. So we define an `items` populate which fetches all `orderItems` entity based on the `orderId` value.
+To demonstrate the opposite direction, we can define another populate to get the `orderItems` of the `order`. So we define an `items` populate which fetches all `orderItems` entities based on the `orderId` value.
 
 ```js
 module.exports = {
@@ -350,13 +350,13 @@ await this.broker.call("tags.get", { id: "...", populate: ["products"] })
 ```
 
 ### One-to-one relation
-In this example there is no an exact one-to-one relation demo because you can cover it with the first one-to-many relation.
+In this example, there is no exact one-to-one relation demo because you can cover it with the first one-to-many relation.
 
 ## Virtual fields
-With the populate feature you can create virtual fields as well. Here are some examples:
+With the populate feature, you can create virtual fields as well. Here are some examples:
 
 ### Number of customer orders
-We create an `orderCount` virtual field which calculate the number of orders by a customer:
+We create an `orderCount` virtual field which calculates the number of orders by a customer:
 
 ```js
 module.exports = {
@@ -408,7 +408,7 @@ await this.broker.call("customers.get", { id: "...", populate: ["orderCount"] })
 ```
 
 ### Total price of orders
-We create a `totalPrice` virtual field which calculate the total price of an order. The `price` comes from the `product` entity of every order item and multiplied by the `quantity` in the order item:
+We create a `totalPrice` virtual field which calculates the total price of an order. The `price` comes from the `product` entity of every order item and is multiplied by the `quantity` in the order item:
 
 ```js
 module.exports = {
