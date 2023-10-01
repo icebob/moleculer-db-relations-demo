@@ -1,6 +1,5 @@
 "use strict";
 
-// const fs = require("fs");
 const DbService	= require("moleculer-db");
 const SqlAdapter = require("moleculer-db-adapter-sequelize");
 // const Sequelize = require("sequelize");
@@ -11,7 +10,7 @@ const SqlAdapter = require("moleculer-db-adapter-sequelize");
  * @typedef {import('moleculer-db').MoleculerDB} MoleculerDB  Moleculer's DB Service Schema
  */
 
-module.exports = function(collection, model) {
+module.exports = function(dbUri, collection, model) {
 	const cacheCleanEventName = `cache.clean.${collection}`;
 
 	/** @type {MoleculerDB & ServiceSchema} */
@@ -65,31 +64,19 @@ module.exports = function(collection, model) {
 		}
 	};
 
-	if (process.env.MONGO_URI) {
+	if (dbUri.startsWith("mongodb://")) {
 		// Mongo adapter
 		const MongoAdapter = require("moleculer-db-adapter-mongo");
 
-		schema.adapter = new MongoAdapter(process.env.MONGO_URI);
+		schema.adapter = new MongoAdapter(dbUri);
 		schema.collection = collection;
-	} else if (process.env.NODE_ENV === "test") {
-		// NeDB memory adapter for testing
-		schema.adapter = new DbService.MemoryAdapter();
-	} else {
-		/*
-		// NeDB file DB adapter
-
-		// Create data folder
-		if (!fs.existsSync("./data")) {
-			fs.mkdirSync("./data");
-		}
-
-		schema.adapter = new DbService.MemoryAdapter({ filename: `./data/${collection}.db` });
-		*/
-
+	} else if (dbUri.startsWith("postgres://")) {
 		// SQLite memory adapter
-		schema.adapter = new SqlAdapter("sqlite://:memory:");
-
+		schema.adapter = new SqlAdapter(dbUri);
 		schema.model = model;
+
+	} else {
+		throw new Error("Invalid DB URI. Accepts only 'mongodb://' or 'postgres://'.");
 	}
 
 	return schema;

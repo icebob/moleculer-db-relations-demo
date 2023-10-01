@@ -4,14 +4,13 @@ const DbMixin = require("../mixins/db.mixin");
 const Sequelize = require("sequelize");
 
 module.exports = {
-	name: "orderItems",
+	name: "product-tags",
 
-	mixins: [DbMixin("postgres://postgres:moleculer@localhost:5432/mol-demo", "orderItems", {
-		name: "orderItem",
+	mixins: [DbMixin("postgres://postgres:moleculer@localhost:5432/mol-demo", "product-tags", {
+		name: "product_tag",
 		define: {
-			orderId: Sequelize.INTEGER,
 			productId: Sequelize.STRING, // because it points to a Mongo ObjectId
-			quantity: Sequelize.INTEGER
+			tagId: Sequelize.STRING, // because it points to a Mongo ObjectId
 		}
 	})],
 
@@ -21,10 +20,10 @@ module.exports = {
 		// Available fields in the responses
 		fields: [
 			"id",
-			"orderId",
 			"productId",
 			"product",
-			"quantity"
+			"tagId",
+			"tag",
 		],
 
 		// Populates for relations
@@ -34,26 +33,24 @@ module.exports = {
 				field: "productId",
 				action: "products.get",
 				params: {
-					fields: ["name", "price", "tags"],
-					populate: ["tags"] // Populate the `tags` field in the product entity
+					fields: ["name", "price"]
 				}
 			},
 
 			// The `orderId` field references to an order.
-			order: {
-				field: "orderId",
-				action: "orders.get",
+			tag: {
+				field: "tagId",
+				action: "tags.get",
 				params: {
-					fields: ["id", "date"]
+					fields: ["id", "name"]
 				}
 			}
 		},
 
 		// Validator for the `create` & `insert` actions.
 		entityValidator: {
-			orderId: "number|integer|positive",
 			productId: "string|no-empty", // because it points to a Mongo ObjectId
-			quantity: "number|integer|positive"
+			tagId: "string|no-empty", // because it points to a Mongo ObjectId
 		}
 	}
 };

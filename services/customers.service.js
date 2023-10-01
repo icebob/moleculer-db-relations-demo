@@ -1,32 +1,12 @@
 "use strict";
 
 const DbMixin = require("../mixins/db.mixin");
-const Sequelize = require("sequelize");
 
-/**
- * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
- * @typedef {import('moleculer').Context} Context Moleculer's Context
- */
-
-/** @type {ServiceSchema} */
 module.exports = {
 	name: "customers",
 
-	/**
-	 * Mixins
-	 */
-	mixins: [DbMixin("customers", {
-		name: "customer",
-		define: {
-			name: Sequelize.STRING,
-			email: Sequelize.STRING,
-			active: Sequelize.BOOLEAN
-		}
-	})],
+	mixins: [DbMixin("mongodb://localhost:27017/mol-demo-customers", "customers")],
 
-	/**
-	 * Settings
-	 */
 	settings: {
 		idField: "id",
 
@@ -36,6 +16,7 @@ module.exports = {
 			"name",
 			"email",
 			"orders",
+			"orderCount", // Virtual field
 			"active"
 		],
 
@@ -46,43 +27,30 @@ module.exports = {
 					cus.orders = await ctx.call("orders.find", {
 						query: {
 							customerId: cus.id
+						},
+						populate: ["orderNumber", "items"]
+					});
+				}));
+			},
+
+			/* It's a virtual field, we calculate the value */
+			async orderCount(ids, customers, rule, ctx) {
+				await Promise.all(customers.map(async cus => {
+					const orders = await ctx.call("orders.find", {
+						query: {
+							customerId: cus.id
 						}
 					});
+					cus.orderCount = orders.length;
 				}));
 			}
 		},
 
 		// Validator for the `create` & `insert` actions.
 		entityValidator: {
-			name: "string|min:3",
+			name: "string",
 			email: "email",
 			active: "boolean"
 		}
-	},
-
-	/**
-	 * Actions
-	 */
-	actions: {
-		/**
-		 * The "moleculer-db" mixin registers the following actions:
-		 *  - list
-		 *  - find
-		 *  - count
-		 *  - create
-		 *  - insert
-		 *  - update
-		 *  - remove
-		 */
-
-		// --- ADDITIONAL ACTIONS ---
-
-	},
-
-	/**
-	 * Fired after database connection establishing.
-	 */
-	async afterConnected() {
-		// await this.adapter.collection.createIndex({ name: 1 });
 	}
 };

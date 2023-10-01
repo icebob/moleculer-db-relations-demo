@@ -3,31 +3,19 @@
 const DbMixin = require("../mixins/db.mixin");
 const Sequelize = require("sequelize");
 
-/**
- * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
- * @typedef {import('moleculer').Context} Context Moleculer's Context
- */
-
-/** @type {ServiceSchema} */
 module.exports = {
 	name: "orders",
 
-	/**
-	 * Mixins
-	 */
-	mixins: [DbMixin("orders", {
+	mixins: [DbMixin("postgres://postgres:moleculer@localhost:5432/mol-demo", "orders", {
 		name: "order",
 		define: {
 			date: Sequelize.DATE,
-			customerId: Sequelize.INTEGER,
+			customerId: Sequelize.STRING, // because it points to a Mongo ObjectId
 			status: Sequelize.STRING,
 
 		}
 	})],
 
-	/**
-	 * Settings
-	 */
 	settings: {
 		idField: "id",
 
@@ -35,6 +23,7 @@ module.exports = {
 		fields: [
 			"id",
 			"date",
+			"orderNumber", // Virtual field
 			"customerId",
 			"customer",
 			"items",
@@ -78,41 +67,20 @@ module.exports = {
 					order.totalPrice = items.reduce((a, b) => a + b.product.price * b.quantity, 0);
 				}));
 			},
+
+			/* It's a virtual field, we calculate the value */
+			orderNumber(ids, orders, rule, ctx) {
+				orders.forEach(order => {
+					order.orderNumber = `ORD-${order.date.getFullYear()}-${order.id}`;
+				});
+			},
 		},
 
 		// Validator for the `create` & `insert` actions.
 		entityValidator: {
 			date: "date",
-			customerId: "number|integer|positive",
-			// it's virtual totalPrice: "number|positive",
+			customerId: "string|no-empty", // because it points to a Mongo ObjectId
 			status: "string|default:pending"
 		}
-	},
-
-	/**
-	 * Actions
-	 */
-	actions: {
-		/**
-		 * The "moleculer-db" mixin registers the following actions:
-		 *  - list
-		 *  - find
-		 *  - count
-		 *  - create
-		 *  - insert
-		 *  - update
-		 *  - remove
-		 */
-
-		// --- ADDITIONAL ACTIONS ---
-
-	},
-
-	/**
-	 * Fired after database connection establishing.
-	 */
-	async afterConnected() {
-		// await this.adapter.collection.createIndex({ date: 1 });
-		// await this.adapter.collection.createIndex({ status: 1 });
 	}
 };

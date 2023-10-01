@@ -3,9 +3,9 @@
 const DbMixin = require("../mixins/db.mixin");
 
 module.exports = {
-	name: "products",
+	name: "tags",
 
-	mixins: [DbMixin("mongodb://localhost:27017/mol-demo-products", "products")],
+	mixins: [DbMixin("mongodb://localhost:27017/mol-demo-tags", "tags")],
 
 	settings: {
 		idField: "id",
@@ -14,30 +14,28 @@ module.exports = {
 		fields: [
 			"id",
 			"name",
-			"price",
-			"tags"
+			"products"
 		],
 
 		// Populates for relations
 		populates: {
-			async tags(ids, products, rule, ctx) {
-				await Promise.all(products.map(async prd => {
+			async products(ids, tags, rule, ctx) {
+				await Promise.all(tags.map(async prd => {
 					const res = await ctx.call("product-tags.find", {
 						query: {
-							productId: prd.id
+							tagId: prd.id
 						},
-						populate: ["tag"]
+						populate: ["product"]
 					});
 
-					prd.tags = res.map(item => item.tag.name);
+					prd.products = res.map(item => item.product);
 				}));
 			},
 		},
 
 		// Validator for the `create` & `insert` actions.
 		entityValidator: {
-			name: "string|min:3",
-			price: "number|positive"
+			name: "string|trim|no-empty"
 		}
 	}
 };
