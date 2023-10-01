@@ -119,7 +119,7 @@ module.exports = {
 await this.broker.call("orders.find", { populate: ["customer"] })
 ```
 
-```bash
+```js
 [
   {
     id: 89,
@@ -181,7 +181,7 @@ module.exports = {
 await this.broker.call("orders.find", { populate: ["items"] })
 ```
 
-```bash
+```js
 [
   {
     id: 89,
@@ -338,7 +338,7 @@ module.exports = {
 await this.broker.call("tags.get", { id: "...", populate: ["products"] })
 ```
 
-```bash
+```js
 {
   id: '65195ead9693271664edc262',
   name: 'Samsung',
@@ -351,6 +351,140 @@ await this.broker.call("tags.get", { id: "...", populate: ["products"] })
 
 ### One-to-one relation
 In this example there is no an exact one-to-one relation demo because you can cover it with the first one-to-many relation.
+
+## Virtual fields
+With the populate feature you can create virtual fields as well. Here are some examples:
+
+### Number of customer orders
+We create an `orderCount` virtual field which calculate the number of orders by a customer:
+
+```js
+module.exports = {
+    name: "customers",
+    
+    settings: {
+        fields: [
+            // ...
+            "orderCount",
+            // ...
+        ],
+
+        // Populates for relations
+        populates: {
+            // ...
+
+            /* It's a virtual field, we calculate the value */
+            async orderCount(ids, customers, rule, ctx) {
+                await Promise.all(customers.map(async cus => {
+                    const orders = await ctx.call("orders.find", {
+                        query: {
+                            customerId: cus.id
+                        }
+                    });
+                    cus.orderCount = orders.length;
+                }));
+            }
+
+            // ...
+        }
+    }
+};
+```
+
+#### Example action call and response
+
+```js
+await this.broker.call("customers.get", { id: "...", populate: ["orderCount"] })
+```
+
+```js
+{
+  id: '651963189693271664edc267',
+  name: 'Jane Doe',
+  email: 'jane@moleculer.services',
+  orderCount: 1,
+  active: false
+}
+```
+
+### Total price of orders
+We create a `totalPrice` virtual field which calculate the total price of an order. The `price` comes from the `product` entity of every order item and multiplied by the `quantity` in the order item:
+
+```js
+module.exports = {
+    name: "orders",
+    
+    settings: {
+        fields: [
+            // ...
+            "totalPrice",
+            // ...
+        ],
+
+        // Populates for relations
+        populates: {
+            // ...
+
+            /* It's a virtual field, we calculate the value */
+            async totalPrice(ids, orders, rule, ctx) {
+                await Promise.all(orders.map(async order => {
+                    const items = await ctx.call("orderItems.find", {
+                        query: {
+                            orderId: order.id
+                        },
+                        populate: ["product"]
+                    });
+
+                    order.totalPrice = items.reduce((a, b) => a + b.product.price * b.quantity, 0);
+                }));
+            },
+            // ...
+        }
+    }
+};
+```
+
+#### Example action call and response
+
+```js
+await this.broker.call("orders.find", { populate: ["totalPrice", "items"] });
+```
+
+```js
+[
+  {
+    id: 97,
+    date: 2023-10-01T12:20:38.631Z,
+    customerId: '651964139693271664edc274',
+    items: [
+      {
+        id: 193,
+        orderId: 97,
+        productId: '651964149693271664edc278',
+        product: {
+          name: 'Samsung Galaxy S21',
+          price: 1199,
+          tags: [ 'Mobile phone', 'Samsung' ]
+        },
+        quantity: 2
+      },
+      {
+        id: 194,
+        orderId: 97,
+        productId: '651964149693271664edc279',
+        product: {
+          name: 'iPhone 13 Pro Max',
+          price: 1099,
+          tags: [ 'Mobile phone', 'Apple' ]
+        },
+        quantity: 1
+      }
+    ],
+    totalPrice: 3497,
+    status: 'completed'
+  }
+]
+```
 
 ## Services
 
