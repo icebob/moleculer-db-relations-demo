@@ -1,9 +1,15 @@
 [![Moleculer](https://badgen.net/badge/Powered%20by/Moleculer/0e83cd)](https://moleculer.services)
 
-# moleculer-db-relations-demo
-This is a [Moleculer](https://moleculer.services/) demo project which demonstrates that how you can create data relations between moleculer-db services following the one-database-per-service microservices concept.
+# Moleculer DB relations
+This is a [Moleculer](https://moleculer.services/) demo project which demonstrates that how you can create database relations between moleculer-db services following the [one-database-per-service](https://microservices.io/patterns/data/database-per-service.html) microservices concept.
 
-## Relations
+## Databases
+
+This demo uses MongoDB and PostgreSQL in a mix in order to better demonstrate the power of populating between tables in different database engines.
+
+### Customers
+
+https://github.com/icebob/moleculer-db-relations-demo/blob/c77985a6b950b014edf18b73e0083007559242de/services/customers.service.js#L1-L56
 
 ```mermaid
 flowchart TB
@@ -27,6 +33,9 @@ flowchart TB
 ```
 
 ## Relations
+
+### Diagram
+This diagram shows the relations between the services.
 
 ```mermaid
 erDiagram
@@ -70,13 +79,17 @@ erDiagram
     TAGS ||--o{ PRODUCT_TAGS : ""
 ```
 
-## Usage
-Start the project with `npm run dev` command. 
+## One-to-many relation
+
+The `orders` service `customerId` field a references to a `customers` entity, so it represents a one-to-many relation. 
+
+
 
 ## Useful links
 
 * Moleculer website: https://moleculer.services/
 * Moleculer Documentation: https://moleculer.services/docs/0.14/
+* Microservices patterns: https://microservices.io/
 
 <!-- 
 https://github.com/ladal1/orm-comparison/tree/main/src/Packages
