@@ -125,7 +125,7 @@ module.exports = {
 				status: "completed"
 			});
 
-			const order1 = await this.broker.call("orders.find", { populate: ["customer", "items", "totalPrice", "orderNumber"] });
+			const order1 = await this.broker.call("orders.find", { populate: ["customer", "items"] });
 			this.logger.info("Find orders and show references for customer and order items (and product):", print(order1));
 
 			const cusOrders = await this.broker.call("customers.get", { id: cus2.id, populate: ["orders", "orderCount"] });
