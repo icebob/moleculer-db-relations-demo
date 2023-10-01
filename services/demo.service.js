@@ -74,16 +74,18 @@ module.exports = {
 			const tag4 = await this.broker.call("tags.create", { name: "Google" });
 			const tag5 = await this.broker.call("tags.create", { name: "Xiaomi" });
 
-			await this.broker.call("product-tags.create", { productId: prd1.id, tagId: tag1.id });
-			await this.broker.call("product-tags.create", { productId: prd1.id, tagId: tag2.id });
-			await this.broker.call("product-tags.create", { productId: prd2.id, tagId: tag1.id });
-			await this.broker.call("product-tags.create", { productId: prd2.id, tagId: tag3.id });
-			await this.broker.call("product-tags.create", { productId: prd3.id, tagId: tag1.id });
-			await this.broker.call("product-tags.create", { productId: prd3.id, tagId: tag4.id });
-			await this.broker.call("product-tags.create", { productId: prd4.id, tagId: tag1.id });
-			await this.broker.call("product-tags.create", { productId: prd4.id, tagId: tag2.id });
-			await this.broker.call("product-tags.create", { productId: prd5.id, tagId: tag1.id });
-			await this.broker.call("product-tags.create", { productId: prd5.id, tagId: tag5.id });
+			await this.broker.call("product-tags.insert", { entities: [
+				{ productId: prd1.id, tagId: tag1.id },
+				{ productId: prd1.id, tagId: tag2.id },
+				{ productId: prd2.id, tagId: tag1.id },
+				{ productId: prd2.id, tagId: tag3.id },
+				{ productId: prd3.id, tagId: tag1.id },
+				{ productId: prd3.id, tagId: tag4.id },
+				{ productId: prd4.id, tagId: tag1.id },
+				{ productId: prd4.id, tagId: tag2.id },
+				{ productId: prd5.id, tagId: tag1.id },
+				{ productId: prd5.id, tagId: tag5.id },
+			]});
 
 			await this.Promise.delay(2000);
 
